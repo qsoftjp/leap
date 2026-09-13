@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <script>
+        // URLに 't=' が含まれていない場合、タイムスタンプを付与して強制再読み込み
+        if (location.search.indexOf('t=') === -1) {
+            const now = Date.now();
+            const joinChar = location.search ? '&' : '?';
+            location.replace(location.pathname + location.search + joinChar + 't=' + now + location.hash);
+        }
+    </script>
     <meta charset="UTF-8">
+    <!-- キャッシュ無効化のための meta タグ -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <!-- スマホでの拡大・縮小を防止 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LEAP英単語2300マスター</title>
