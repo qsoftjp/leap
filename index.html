@@ -78,32 +78,32 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
     <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-black flex items-center gap-2.5 cursor-pointer tracking-tight" onclick="showHomeScreen()">
-                <div class="w-9 h-9 bg-yellow-400 text-indigo-900 rounded-lg flex items-center justify-center shadow-md">
-                    <i class="fa-solid fa-bolt text-lg"></i>
+        <div class="max-w-5xl mx-auto px-4 py-2.5 md:py-3.5 flex justify-between items-center">
+            <h1 class="text-lg md:text-2xl font-black flex items-center gap-2 cursor-pointer tracking-tight" onclick="showHomeScreen()">
+                <div class="w-8 h-8 md:w-9 md:h-9 bg-yellow-400 text-indigo-900 rounded-lg flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-bolt text-base md:text-lg"></i>
                 </div>
-                <span>LEAP <span class="text-yellow-300 font-extrabold text-sm md:text-base border border-yellow-300/40 px-2 py-0.5 rounded-full ml-1">2300</span></span>
+                <span>LEAP <span class="text-yellow-300 font-extrabold text-xs md:text-base border border-yellow-300/40 px-1.5 py-0.5 rounded-full ml-0.5">2300</span></span>
             </h1>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 md:gap-2">
                 <!-- Speech Synthesizer Toggle -->
-                <button onclick="toggleSpeech()" id="btn-speech-toggle" class="p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition" title="読み上げオン/オフ">
+                <button onclick="toggleSpeech()" id="btn-speech-toggle" class="p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition" title="読み上げオン/オフ">
                     <i class="fa-solid fa-bullhorn" id="icon-speech"></i>
                 </button>
 
                 <!-- Sound Toggle -->
-                <button onclick="toggleAudio()" id="btn-audio-toggle" class="p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition" title="効果音オン/オフ">
+                <button onclick="toggleAudio()" id="btn-audio-toggle" class="p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition" title="効果音オン/オフ">
                     <i class="fa-solid fa-volume-high" id="icon-audio"></i>
                 </button>
 
                 <!-- Data Import/Export Modal Trigger -->
-                <button onclick="openDataModal()" class="p-2 md:px-3 md:py-1.5 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-xs md:text-sm font-semibold transition flex items-center gap-1.5">
+                <button onclick="openDataModal()" class="p-1.5 md:px-3 md:py-1.5 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-xs md:text-sm font-semibold transition flex items-center gap-1">
                     <i class="fa-solid fa-database"></i> <span class="hidden md:inline">データ管理</span>
                 </button>
 
                 <!-- Stats Header -->
-                <div id="header-stats" class="text-xs md:text-sm bg-indigo-800/80 px-3 py-1.5 rounded-xl flex items-center gap-2 border border-indigo-500/30">
+                <div id="header-stats" class="text-[11px] md:text-sm bg-indigo-800/80 px-2 py-1 md:px-3 md:py-1.5 rounded-xl flex items-center gap-1.5 border border-indigo-500/30">
                     <i class="fa-solid fa-trophy text-yellow-400"></i>
                     <span>クリア: <strong id="cleared-count" class="text-yellow-300 font-extrabold">0</strong> / <span id="total-stages-count">92</span></span>
                 </div>
@@ -111,30 +111,30 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-1 flex flex-col justify-start">
+    <main class="max-w-5xl mx-auto w-full px-3 md:px-4 py-2 sm:py-6 flex-1 flex flex-col justify-start">
 
         <!-- SCREEN: HOME / STAGE SELECT -->
-        <section id="screen-home" class="space-y-6">
+        <section id="screen-home" class="space-y-4 sm:space-y-6">
             
             <!-- Hero Title & Mode Selector -->
-            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3 sm:space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div>
-                        <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <h2 class="text-lg md:text-2xl font-extrabold text-slate-900 flex items-center gap-2">
                             <span>学習モードを選択</span>
                         </h2>
-                        <p class="text-slate-500 text-xs md:text-sm mt-1">モードごとの進捗状況を確認しながらマスターを目指しましょう。</p>
+                        <p class="text-slate-500 text-xs md:text-sm mt-0.5">モードごとの進捗状況を確認しながらマスターを目指しましょう。</p>
                     </div>
 
                     <!-- Mode Toggle Selector -->
                     <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start md:self-auto flex-wrap gap-1">
-                        <button id="mode-choice-btn" onclick="selectMode('choice')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white">
+                        <button id="mode-choice-btn" onclick="selectMode('choice')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-sm bg-indigo-600 text-white">
                             <i class="fa-solid fa-list-check"></i> 英語4択
                         </button>
-                        <button id="mode-jp-choice-btn" onclick="selectMode('jp_choice')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                        <button id="mode-jp-choice-btn" onclick="selectMode('jp_choice')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 text-slate-600 hover:text-slate-900">
                             <i class="fa-solid fa-language"></i> 日本語4択
                         </button>
-                        <button id="mode-input-btn" onclick="selectMode('input')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                        <button id="mode-input-btn" onclick="selectMode('input')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 text-slate-600 hover:text-slate-900">
                             <i class="fa-solid fa-keyboard"></i> スペル入力
                         </button>
                     </div>
@@ -146,21 +146,21 @@
                         <span><span id="current-mode-label" class="text-indigo-600 font-extrabold">英語4択</span> モード達成率 (全100%達成度)</span>
                         <span id="overall-progress-percentage" class="text-indigo-600">0% (0 / 92ステージ)</span>
                     </div>
-                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
                         <div id="overall-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-0 transition-all duration-500"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Stage Filter & Jump Bar -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto custom-scrollbar">
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2.5">
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto custom-scrollbar">
                     <span class="text-xs font-bold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i>パート別:</span>
-                    <button onclick="filterStages('all')" class="stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-indigo-50 text-indigo-600 border border-indigo-200 transition whitespace-nowrap" data-filter="all">すべて (1-92)</button>
-                    <button onclick="filterStages('part1')" class="stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part1">Part 1 (1-500)</button>
-                    <button onclick="filterStages('part2')" class="stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part2">Part 2 (501-1000)</button>
-                    <button onclick="filterStages('part3')" class="stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part3">Part 3 (1001-1600)</button>
-                    <button onclick="filterStages('part4')" class="stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part4">Part 4 (1601-2300)</button>
+                    <button onclick="filterStages('all')" class="stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-indigo-50 text-indigo-600 border border-indigo-200 transition whitespace-nowrap" data-filter="all">すべて (1-92)</button>
+                    <button onclick="filterStages('part1')" class="stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part1">Part 1 (1-500)</button>
+                    <button onclick="filterStages('part2')" class="stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part2">Part 2 (501-1000)</button>
+                    <button onclick="filterStages('part3')" class="stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part3">Part 3 (1001-1600)</button>
+                    <button onclick="filterStages('part4')" class="stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap" data-filter="part4">Part 4 (1601-2300)</button>
                 </div>
 
                 <div class="flex items-center gap-2 ml-auto w-full md:w-auto justify-end">
@@ -171,102 +171,100 @@
             </div>
 
             <!-- Stage Grid Container -->
-            <div id="stage-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div id="stage-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
                 <!-- Dynamically populated via JS -->
             </div>
         </section>
 
         <!-- SCREEN: QUIZ -->
-        <section id="screen-quiz" class="hidden space-y-4 max-w-2xl mx-auto w-full my-auto">
+        <section id="screen-quiz" class="hidden space-y-2.5 max-w-2xl mx-auto w-full my-auto">
             <!-- Quiz Bar -->
-            <div class="flex justify-between items-center bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-200">
-                <button onclick="quitQuiz()" class="text-slate-500 hover:text-slate-800 text-xs md:text-sm flex items-center gap-1.5 font-bold transition">
-                    <i class="fa-solid fa-arrow-left"></i> 一覧に戻る
+            <div class="flex justify-between items-center bg-white px-3.5 py-2 rounded-xl shadow-sm border border-slate-200">
+                <button onclick="quitQuiz()" class="text-slate-500 hover:text-slate-800 text-xs flex items-center gap-1 font-bold transition">
+                    <i class="fa-solid fa-arrow-left"></i> 一覧へ
                 </button>
-                <div class="flex items-center gap-2">
-                    <span id="quiz-stage-title" class="font-black text-indigo-600 text-sm md:text-base">Stage 1</span>
-                    <span id="quiz-mode-badge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-2 py-0.5 rounded-md">英語4択</span>
+                <div class="flex items-center gap-1.5">
+                    <span id="quiz-stage-title" class="font-black text-indigo-600 text-xs sm:text-base">Stage 1</span>
+                    <span id="quiz-mode-badge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-1.5 py-0.5 rounded-md">英語4択</span>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="togglePause()" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold transition flex items-center gap-1">
-                        <i class="fa-solid fa-pause"></i> 一時停止
+                <div class="flex items-center gap-2">
+                    <button onclick="togglePause()" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-pause"></i> 停止
                     </button>
                     <span id="quiz-progress-text" class="text-xs font-bold text-slate-400">1 / 25</span>
                 </div>
             </div>
 
             <!-- Quiz Stage Progress Bar -->
-            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+            <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                 <div id="quiz-progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
             </div>
 
             <!-- タイマーバー -->
-            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200">
                 <div id="timer-bar" class="bg-amber-500 h-full w-full transition-all linear"></div>
             </div>
 
-            <!-- Question Card -->
-            <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-200 text-center space-y-2 relative overflow-hidden">
+            <!-- Question Card (高さ・内側余白をiPhone12向けに最適化) -->
+            <div class="bg-white p-3.5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 text-center space-y-1.5 relative overflow-hidden">
                 <div class="flex justify-between items-center">
-                    <span id="word-id-tag" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">No. 1</span>
-                    <span id="question-instruction-tag" class="text-xs font-semibold text-slate-400">意味から英単語を回答</span>
+                    <span id="word-id-tag" class="text-[11px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">No. 1</span>
+                    <span id="question-instruction-tag" class="text-[11px] font-semibold text-slate-400">意味から英単語を回答</span>
                 </div>
                 
-                <h2 id="question-meaning" class="text-2xl sm:text-3xl font-black text-slate-800 py-2 min-h-[4rem] flex items-center justify-center">
+                <h2 id="question-meaning" class="text-xl sm:text-3xl font-black text-slate-800 py-1 sm:py-2 min-h-[3rem] sm:min-h-[4rem] flex items-center justify-center">
                     ---
                 </h2>
 
-                <div id="feedback-box" class="h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm invisible">
+                <div id="feedback-box" class="h-8 flex items-center justify-center rounded-lg text-center font-bold text-xs transition shadow-sm invisible">
                     <span id="feedback-text"></span>
                 </div>
-
-                <div class="text-[11px] text-slate-400 pt-1">ショートカット: [1-4]または[Enter]で即答</div>
             </div>
 
-            <!-- Mode A & B: 4 Choice Buttons Container -->
-            <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            <!-- Mode A & B: 4 Choice Buttons Container (iPhone12全画面収まり用に最少高さを短縮) -->
+            <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
 
             <!-- Mode C: Input Word Mode -->
-            <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-3">
+            <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-2">
                 <div class="relative">
-                    <input type="text" id="word-input" autocomplete="off" spellcheck="false" placeholder="英単語を入力してください..."
-                        class="w-full text-center text-xl font-bold py-4 px-4 border-2 border-slate-300 rounded-2xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800">
+                    <input type="text" id="word-input" autocomplete="off" spellcheck="false" placeholder="英単語を入力..."
+                        class="w-full text-center text-lg font-bold py-3 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition text-base flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-1.5">
                     回答する (Enter) <i class="fa-solid fa-paper-plane text-xs"></i>
                 </button>
             </form>
         </section>
 
         <!-- SCREEN: RESULT -->
-        <section id="screen-result" class="hidden space-y-6 max-w-md mx-auto w-full text-center my-auto">
-            <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 space-y-6">
-                <div id="result-icon-container" class="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-amber-100 text-amber-500">
+        <section id="screen-result" class="hidden space-y-4 max-w-md mx-auto w-full text-center my-auto">
+            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 space-y-4">
+                <div id="result-icon-container" class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-md bg-amber-100 text-amber-500">
                     <i class="fa-solid fa-crown"></i>
                 </div>
 
                 <div>
-                    <h2 class="text-2xl font-black text-slate-900" id="result-title">Stage クリア！</h2>
-                    <p class="text-slate-500 text-xs md:text-sm mt-1" id="result-subtitle">素晴らしい集中力です！</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900" id="result-title">Stage クリア！</h2>
+                    <p class="text-slate-500 text-xs sm:text-sm mt-1" id="result-subtitle">素晴らしい集中力です！</p>
                 </div>
 
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-around items-center">
+                <div class="bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-100 flex justify-around items-center">
                     <div>
-                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">正解数</div>
-                        <div class="text-2xl font-black text-indigo-600"><span id="result-score">0</span> / 25</div>
+                        <div class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider">正解数</div>
+                        <div class="text-xl sm:text-2xl font-black text-indigo-600"><span id="result-score">0</span> / 25</div>
                     </div>
                     <div class="h-8 w-[1px] bg-slate-200"></div>
                     <div>
-                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">正解率</div>
-                        <div class="text-2xl font-black text-emerald-600" id="result-accuracy">0%</div>
+                        <div class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider">正解率</div>
+                        <div class="text-xl sm:text-2xl font-black text-emerald-600" id="result-accuracy">0%</div>
                     </div>
                 </div>
 
-                <div class="space-y-2.5 pt-2">
-                    <button onclick="restartCurrentStage()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+                <div class="space-y-2 pt-1">
+                    <button onclick="restartCurrentStage()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-rotate-right"></i> もう一度挑戦する
                     </button>
-                    <button onclick="showHomeScreen()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2">
+                    <button onclick="showHomeScreen()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-house"></i> ステージ一覧へ戻る
                     </button>
                 </div>
@@ -277,19 +275,19 @@
 
     <!-- MODAL: PAUSE SCREEN -->
     <div id="modal-pause" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border border-slate-100">
-            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-sm">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border border-slate-100">
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-xl mx-auto shadow-sm">
                 <i class="fa-solid fa-pause"></i>
             </div>
             <div>
-                <h3 class="text-xl font-black text-slate-800">一時停止中</h3>
-                <p class="text-xs text-slate-500 mt-1">タイマーのカウントダウンを一時停止しています。</p>
+                <h3 class="text-lg font-black text-slate-800">一時停止中</h3>
+                <p class="text-xs text-slate-500 mt-0.5">タイマーのカウントダウンを一時停止しています。</p>
             </div>
-            <div class="space-y-2 pt-2">
-                <button onclick="togglePause()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl shadow-md transition">
+            <div class="space-y-2 pt-1">
+                <button onclick="togglePause()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow-md transition text-sm">
                     再開する
                 </button>
-                <button onclick="quitQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-2xl transition text-xs">
+                <button onclick="quitQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition text-xs">
                     中断してステージ一覧へ戻る
                 </button>
             </div>
@@ -299,26 +297,26 @@
     <!-- MODAL: DATA MANAGEMENT -->
     <div id="modal-data" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-5 bg-indigo-600 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg flex items-center gap-2">
+            <div class="p-4 bg-indigo-600 text-white flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg flex items-center gap-2">
                     <i class="fa-solid fa-database"></i> 単語データ管理 (2300語)
                 </h3>
                 <button onclick="closeDataModal()" class="text-indigo-200 hover:text-white transition text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="p-6 space-y-4 overflow-y-auto custom-scrollbar text-xs md:text-sm">
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar text-xs md:text-sm">
                 <p class="text-slate-600">
                     現在の全2,300語データをJSONファイルとしてエクスポート・インポートできます。独自の単語帳データの流入も可能です。
                 </p>
 
-                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-2">
+                <div class="bg-indigo-50 border border-indigo-200 p-3.5 rounded-2xl space-y-1">
                     <div class="font-bold text-indigo-900">現在ロード中の単語数</div>
-                    <div class="text-2xl font-black text-indigo-600"><span id="modal-word-count">2300</span> / 2300 語</div>
+                    <div class="text-xl font-black text-indigo-600"><span id="modal-word-count">2300</span> / 2300 語</div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="block font-bold text-slate-700">JSON形式でのエクスポート</label>
-                    <button onclick="exportWordData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                    <button onclick="exportWordData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-download"></i> 単語データをJSONダウンロード
                     </button>
                 </div>
@@ -326,7 +324,7 @@
                 <div class="space-y-2 pt-2 border-t border-slate-200">
                     <label class="block font-bold text-slate-700">JSONファイルからインポート</label>
                     <input type="file" id="import-file-input" accept=".json" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                    <button onclick="importWordData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 mt-2">
+                    <button onclick="importWordData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-2 mt-2">
                         <i class="fa-solid fa-upload"></i> インポート実行
                     </button>
                 </div>
@@ -335,7 +333,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+    <footer class="bg-white border-t border-slate-200 py-2 text-center text-[11px] text-slate-400">
         LEAP Vocabulary Master 2300 &copy; 2026
     </footer>
 
@@ -589,10 +587,10 @@
             const btn = document.getElementById('btn-audio-toggle');
             if (audioEnabled) {
                 icon.className = "fa-solid fa-volume-high";
-                btn.className = "p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition";
+                btn.className = "p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition";
             } else {
                 icon.className = "fa-solid fa-volume-xmark";
-                btn.className = "p-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-slate-400 text-sm transition";
+                btn.className = "p-1.5 md:p-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-slate-400 text-xs md:text-sm transition";
             }
         }
 
@@ -602,10 +600,10 @@
             const btn = document.getElementById('btn-speech-toggle');
             if (speechEnabled) {
                 icon.className = "fa-solid fa-bullhorn";
-                btn.className = "p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition";
+                btn.className = "p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition";
             } else {
                 icon.className = "fa-solid fa-comment-slash";
-                btn.className = "p-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-slate-400 text-sm transition";
+                btn.className = "p-1.5 md:p-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-slate-400 text-xs md:text-sm transition";
             }
         }
 
@@ -690,16 +688,16 @@
             const jpChoiceBtn = document.getElementById('mode-jp-choice-btn');
             const inputBtn = document.getElementById('mode-input-btn');
 
-            choiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
-            jpChoiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
-            inputBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            choiceBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 text-slate-600 hover:text-slate-900";
+            jpChoiceBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 text-slate-600 hover:text-slate-900";
+            inputBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 text-slate-600 hover:text-slate-900";
 
             if (mode === 'choice') {
-                choiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white";
+                choiceBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-sm bg-indigo-600 text-white";
             } else if (mode === 'jp_choice') {
-                jpChoiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white";
+                jpChoiceBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-sm bg-indigo-600 text-white";
             } else {
-                inputBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-emerald-600 text-white";
+                inputBtn.className = "px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-sm bg-emerald-600 text-white";
             }
 
             renderStageGrid();
@@ -710,9 +708,9 @@
             activeFilter = filter;
             document.querySelectorAll('.stage-filter-btn').forEach(btn => {
                 if (btn.dataset.filter === filter) {
-                    btn.className = "stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-indigo-50 text-indigo-600 border border-indigo-200 transition whitespace-nowrap";
+                    btn.className = "stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-indigo-50 text-indigo-600 border border-indigo-200 transition whitespace-nowrap";
                 } else {
-                    btn.className = "stage-filter-btn text-xs px-3 py-1.5 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap";
+                    btn.className = "stage-filter-btn text-xs px-2.5 py-1 rounded-lg font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap";
                 }
             });
             renderStageGrid();
@@ -763,14 +761,14 @@
                     if (e.currentTarget) e.currentTarget.blur();
                     startStage(i);
                 };
-                card.className = `p-3 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden ${
+                card.className = `p-2.5 sm:p-3 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden ${
                     isCurrentMode100 
                         ? 'bg-amber-50/70 border-amber-400 hover:border-amber-500' 
                         : (currentModeData.cleared ? 'bg-emerald-50/60 border-emerald-400 hover:border-emerald-500' : 'bg-white border-slate-200 hover:border-indigo-400')
                 }`;
 
                 const badgesHtml = `
-                    <div class="flex items-center gap-1 text-[10px] mt-2 pt-1 border-t border-slate-100">
+                    <div class="flex items-center gap-1 text-[10px] mt-1.5 pt-1 border-t border-slate-100">
                         <span class="${isChoice100 ? 'text-emerald-600 font-bold' : 'text-slate-300'}" title="英語4択 100%">英</span>
                         <span class="${isJpChoice100 ? 'text-indigo-600 font-bold' : 'text-slate-300'}" title="日本語4択 100%">日</span>
                         <span class="${isInput100 ? 'text-amber-600 font-bold' : 'text-slate-300'}" title="スペル入力 100%">入力</span>
@@ -778,7 +776,7 @@
                 `;
 
                 card.innerHTML = `
-                    <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center justify-between mb-0.5">
                         <span class="text-[10px] font-black tracking-wider ${isCurrentMode100 ? 'text-amber-700' : (currentModeData.cleared ? 'text-emerald-700' : 'text-slate-400')}">STAGE ${i + 1}</span>
                         ${isCurrentMode100 
                             ? `<span class="bg-amber-400 text-amber-950 text-[9px] px-1.5 py-0.5 rounded-md font-extrabold flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-crown text-yellow-100"></i> 100%</span>` 
@@ -869,11 +867,28 @@
                     speakWord(currentObj.word);
                 }
 
-                const otherWords = leap_words.filter(w => w.word !== currentObj.word);
-                const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
+                // 英単語および日本語の意味が重複しないようにフィルタリング
+                const otherWords = leap_words.filter(w => w.word !== currentObj.word && w.meaning !== currentObj.meaning);
+                
+                let shuffledOthers = [];
+                if (!isChoice) {
+                    // 日本語4択モードの場合、選択肢間で日本語（meaning）が被らないよう抽出
+                    const usedMeanings = new Set([currentObj.meaning]);
+                    const candidates = shuffleArray([...otherWords]);
+                    for (const w of candidates) {
+                        if (!usedMeanings.has(w.meaning)) {
+                            usedMeanings.add(w.meaning);
+                            shuffledOthers.push(w);
+                            if (shuffledOthers.length === 3) break;
+                        }
+                    }
+                } else {
+                    shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
+                }
+
                 const options = shuffleArray([currentObj, ...shuffledOthers]);
 
-                // ★ ボタンを毎回完全再構築 (pointer-events-none, 内部グループホバー排除)
+                // ★ iPhone12等モバイル画面で一画面に収まるようパディング・最小高さを最適化
                 const container = document.getElementById('area-choice-mode');
                 container.innerHTML = '';
 
@@ -882,13 +897,13 @@
                     btn.id = `choice-${i}`;
                     btn.type = "button";
                     btn.dataset.correct = (opt.word === currentObj.word) ? "true" : "false";
-                    btn.className = "choice-btn w-full bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left select-none";
+                    btn.className = "choice-btn w-full bg-white border-2 border-slate-200 py-2.5 px-3.5 rounded-xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.1rem] text-left select-none";
                     
                     const labelText = isChoice ? opt.word : opt.meaning;
                     btn.innerHTML = `
-                        <span class="flex items-center gap-3 pointer-events-none">
-                            <span class="choice-num w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black transition">${i + 1}</span>
-                            <span id="choice-text-${i}" class="text-base font-bold text-slate-800">${labelText}</span>
+                        <span class="flex items-center gap-2.5 pointer-events-none">
+                            <span class="choice-num w-6 h-6 bg-slate-100 text-slate-500 rounded-md flex items-center justify-center text-xs font-black transition">${i + 1}</span>
+                            <span id="choice-text-${i}" class="text-sm sm:text-base font-bold text-slate-800">${labelText}</span>
                         </span>
                         <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300 pointer-events-none"></i>
                     `;
@@ -903,7 +918,7 @@
                 const inputEl = document.getElementById('word-input');
                 inputEl.value = '';
                 inputEl.disabled = false;
-                inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-slate-300 rounded-2xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800";
+                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800";
                 setTimeout(() => inputEl.focus(), 50);
             }
 
@@ -984,14 +999,14 @@
                     if (btn) {
                         btn.disabled = true;
                         if (btn.dataset.correct === "true") {
-                            btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left";
+                            btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white py-2.5 px-3.5 rounded-xl font-bold shadow-sm flex items-center justify-between min-h-[3.1rem] text-left";
                         }
                     }
                 }
             } else {
                 const inputEl = document.getElementById('word-input');
                 inputEl.disabled = true;
-                inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-2xl focus:outline-none shadow-sm transition shake";
+                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
             }
 
             const correctInfo = `${currentStageWords[currentQuestionIndex].word} : ${currentStageWords[currentQuestionIndex].meaning}`;
@@ -1017,9 +1032,9 @@
                     btn.disabled = true;
                     btn.blur();
                     if (btn.dataset.correct === "true") {
-                        btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left";
+                        btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white py-2.5 px-3.5 rounded-xl font-bold shadow-sm flex items-center justify-between min-h-[3.1rem] text-left";
                     } else if (i === selectedIndex && !isCorrect) {
-                        btn.className = "choice-btn bg-rose-500 border-2 border-rose-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left shake";
+                        btn.className = "choice-btn bg-rose-500 border-2 border-rose-500 text-white py-2.5 px-3.5 rounded-xl font-bold shadow-sm flex items-center justify-between min-h-[3.1rem] text-left shake";
                     }
                 }
             }
@@ -1054,11 +1069,11 @@
             if (userVal === correctVal) {
                 score++;
                 playSound('correct');
-                inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-emerald-500 bg-emerald-50 text-emerald-800 rounded-2xl focus:outline-none shadow-sm transition";
+                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-emerald-500 bg-emerald-50 text-emerald-800 rounded-xl focus:outline-none shadow-sm transition";
                 showFeedback(true, "正解！ GREAT!");
             } else {
                 playSound('wrong');
-                inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-2xl focus:outline-none shadow-sm transition shake";
+                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
                 showFeedback(false, `不正解... 正解: ${currentStageWords[currentQuestionIndex].word}`);
             }
 
@@ -1072,9 +1087,9 @@
             textEl.textContent = text;
 
             if (isCorrect) {
-                box.className = "h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
+                box.className = "h-8 flex items-center justify-center rounded-lg text-center font-bold text-xs transition shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
             } else {
-                box.className = "h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
+                box.className = "h-8 flex items-center justify-center rounded-lg text-center font-bold text-xs transition shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
             }
         }
 
@@ -1117,7 +1132,7 @@
 
                     document.getElementById('result-title').textContent = `Stage ${currentStageIndex + 1} PERFECT!!`;
                     document.getElementById('result-subtitle').textContent = "素晴らしい！全問正解パーフェクト達成です！完璧な記憶力です！";
-                    iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-yellow-400 text-indigo-950 animate-bounce";
+                    iconContainer.className = "w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-md bg-yellow-400 text-indigo-950 animate-bounce";
                     iconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
 
                     if (typeof confetti === 'function') {
@@ -1130,13 +1145,13 @@
                 } else {
                     document.getElementById('result-title').textContent = `Stage ${currentStageIndex + 1} クリア！`;
                     document.getElementById('result-subtitle').textContent = "素晴らしい成果です！次も挑戦しましょう。";
-                    iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-emerald-100 text-emerald-600";
+                    iconContainer.className = "w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-md bg-emerald-100 text-emerald-600";
                     iconContainer.innerHTML = '<i class="fa-solid fa-award"></i>';
                 }
             } else {
                 document.getElementById('result-title').textContent = "もう一歩！";
                 document.getElementById('result-subtitle').textContent = "正解率70%以上でクリアとなります。再挑戦しよう！";
-                iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-amber-100 text-amber-600";
+                iconContainer.className = "w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-md bg-amber-100 text-amber-600";
                 iconContainer.innerHTML = '<i class="fa-solid fa-seedling"></i>';
             }
         }
