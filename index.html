@@ -60,6 +60,10 @@
                 border-color: #818cf8 !important;
             }
         }
+        /* タッチデバイスでフォーカス・アクティブ時の不要なスタイルを無効化 */
+        .choice-btn:focus, .choice-btn:active {
+            outline: none !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
@@ -594,7 +598,7 @@
                         gain.gain.setValueAtTime(0.1, now + 0.24);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
                         osc.start(now + 0.24);
-                        osc.stop(now + 1.0);
+                        osc.stop(1.0);
                     });
                 }
             } catch (e) {
@@ -821,6 +825,11 @@
         }
 
         function startStage(stageIdx) {
+            // ★ STAGE選択時のフォーカス・アクティブ状態を即時解除
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+
             currentStageIndex = stageIdx;
             const startIndex = stageIdx * WORDS_PER_STAGE;
             const endIndex = Math.min(startIndex + WORDS_PER_STAGE, leap_words.length);
@@ -850,12 +859,20 @@
                 document.getElementById('area-input-mode').classList.remove('hidden');
             }
 
-            renderQuestion();
+            // iOS Safariで直前のタップフォーカスが持ち込まれないよう一瞬送らせて非同期描画
+            setTimeout(() => {
+                renderQuestion();
+            }, 10);
         }
 
         function renderQuestion() {
             isAnswering = true;
             hideFeedback();
+
+            // ★ 新しい問題に移る際、全選択肢ボタンのフォーカス・タップ状態をリセット
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
 
             const total = currentStageWords.length;
             const currentObj = currentStageWords[currentQuestionIndex];
@@ -1025,6 +1042,7 @@
             for (let i = 0; i < 4; i++) {
                 const btn = document.getElementById(`choice-${i}`);
                 btn.disabled = true;
+                btn.blur(); // ★ 全ボタンのフォーカスを明示的に解除
                 if (btn.dataset.correct === "true") {
                     btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
                 } else if (i === selectedIndex && !isCorrect) {
