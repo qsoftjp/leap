@@ -14,14 +14,18 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- スマホでの拡大・縮小を防止 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LEAP英単語2300マスター</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- パーフェクト演出用 confettiライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            touch-action: manipulation;
         }
         .shake {
             animation: shake 0.3s ease-in-out;
@@ -59,6 +63,11 @@
             </h1>
             
             <div class="flex items-center gap-2">
+                <!-- Speech Synthesizer Toggle -->
+                <button onclick="toggleSpeech()" id="btn-speech-toggle" class="p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition" title="読み上げオン/オフ">
+                    <i class="fa-solid fa-bullhorn" id="icon-speech"></i>
+                </button>
+
                 <!-- Sound Toggle -->
                 <button onclick="toggleAudio()" id="btn-audio-toggle" class="p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition" title="効果音オン/オフ">
                     <i class="fa-solid fa-volume-high" id="icon-audio"></i>
@@ -90,16 +99,19 @@
                         <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 flex items-center gap-2">
                             <span>学習モードを選択</span>
                         </h2>
-                        <p class="text-slate-500 text-xs md:text-sm mt-1">全2300単語（92ステージ）を完全網羅。最適な方法で暗記しましょう。</p>
+                        <p class="text-slate-500 text-xs md:text-sm mt-1">モードごとの進捗状況を確認しながらマスターを目指しましょう。</p>
                     </div>
 
                     <!-- Mode Toggle Selector -->
-                    <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start md:self-auto">
-                        <button id="mode-choice-btn" onclick="selectMode('choice')" class="px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 shadow-sm bg-indigo-600 text-white">
-                            <i class="fa-solid fa-list-check"></i> 4択クイズ
+                    <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start md:self-auto flex-wrap gap-1">
+                        <button id="mode-choice-btn" onclick="selectMode('choice')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white">
+                            <i class="fa-solid fa-list-check"></i> 英語4択
                         </button>
-                        <button id="mode-input-btn" onclick="selectMode('input')" class="px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
-                            <i class="fa-solid fa-keyboard"></i> 単語スペル入力
+                        <button id="mode-jp-choice-btn" onclick="selectMode('jp_choice')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-language"></i> 日本語4択
+                        </button>
+                        <button id="mode-input-btn" onclick="selectMode('input')" class="px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-keyboard"></i> スペル入力
                         </button>
                     </div>
                 </div>
@@ -107,8 +119,8 @@
                 <!-- Overall Progress Bar -->
                 <div>
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-1">
-                        <span>全単語達成率</span>
-                        <span id="overall-progress-percentage" class="text-indigo-600">0% (0 / 2300語)</span>
+                        <span><span id="current-mode-label" class="text-indigo-600 font-extrabold">英語4択</span> モード達成率 (全100%達成度)</span>
+                        <span id="overall-progress-percentage" class="text-indigo-600">0% (0 / 92ステージ)</span>
                     </div>
                     <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200">
                         <div id="overall-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-0 transition-all duration-500"></div>
@@ -141,38 +153,53 @@
         </section>
 
         <!-- SCREEN: QUIZ -->
-        <section id="screen-quiz" class="hidden space-y-5 max-w-2xl mx-auto w-full my-auto">
+        <section id="screen-quiz" class="hidden space-y-4 max-w-2xl mx-auto w-full my-auto">
             <!-- Quiz Bar -->
             <div class="flex justify-between items-center bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-200">
-                <button onclick="showHomeScreen()" class="text-slate-500 hover:text-slate-800 text-xs md:text-sm flex items-center gap-1.5 font-bold transition">
+                <button onclick="quitQuiz()" class="text-slate-500 hover:text-slate-800 text-xs md:text-sm flex items-center gap-1.5 font-bold transition">
                     <i class="fa-solid fa-arrow-left"></i> 一覧に戻る
                 </button>
                 <div class="flex items-center gap-2">
                     <span id="quiz-stage-title" class="font-black text-indigo-600 text-sm md:text-base">Stage 1</span>
-                    <span id="quiz-mode-badge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-2 py-0.5 rounded-md">4択</span>
+                    <span id="quiz-mode-badge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-2 py-0.5 rounded-md">英語4択</span>
                 </div>
-                <span id="quiz-progress-text" class="text-xs font-bold text-slate-400">1 / 25</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="togglePause()" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-pause"></i> 一時停止
+                    </button>
+                    <span id="quiz-progress-text" class="text-xs font-bold text-slate-400">1 / 25</span>
+                </div>
             </div>
 
-            <!-- Quiz Progress Bar -->
+            <!-- Quiz Stage Progress Bar -->
             <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                 <div id="quiz-progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
             </div>
 
-            <!-- Question Card -->
-            <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-md border border-slate-200 text-center space-y-3 relative overflow-hidden">
-                <div class="flex justify-between items-center">
-                    <span id="word-id-tag" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">No. 1</span>
-                    <span class="text-xs font-semibold text-slate-400">意味から英単語を回答</span>
-                </div>
-                
-                <h2 id="question-meaning" class="text-2xl sm:text-3xl font-black text-slate-800 py-4 min-h-[5rem] flex items-center justify-center">
-                    ---
-                </h2>
-                <div class="text-xs text-slate-400">ショートカット: [1-4]または[Enter]で即答</div>
+            <!-- タイマーバー -->
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+                <div id="timer-bar" class="bg-amber-500 h-full w-full transition-all linear"></div>
             </div>
 
-            <!-- Mode A: 4 Choice Buttons -->
+            <!-- Question Card -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-md border border-slate-200 text-center space-y-2 relative overflow-hidden">
+                <div class="flex justify-between items-center">
+                    <span id="word-id-tag" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">No. 1</span>
+                    <span id="question-instruction-tag" class="text-xs font-semibold text-slate-400">意味から英単語を回答</span>
+                </div>
+                
+                <h2 id="question-meaning" class="text-2xl sm:text-3xl font-black text-slate-800 py-2 min-h-[4rem] flex items-center justify-center">
+                    ---
+                </h2>
+
+                <div id="feedback-box" class="h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm invisible">
+                    <span id="feedback-text"></span>
+                </div>
+
+                <div class="text-[11px] text-slate-400 pt-1">ショートカット: [1-4]または[Enter]で即答</div>
+            </div>
+
+            <!-- Mode A & B: 4 Choice Buttons -->
             <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button onclick="checkChoiceAnswer(0)" id="choice-0" class="choice-btn group bg-white hover:bg-indigo-50/80 border-2 border-slate-200 hover:border-indigo-400 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left">
                     <span class="flex items-center gap-3">
@@ -207,7 +234,7 @@
                 </button>
             </div>
 
-            <!-- Mode B: Input Word Mode -->
+            <!-- Mode C: Input Word Mode -->
             <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-3">
                 <div class="relative">
                     <input type="text" id="word-input" autocomplete="off" spellcheck="false" placeholder="英単語を入力してください..."
@@ -217,11 +244,6 @@
                     回答する (Enter) <i class="fa-solid fa-paper-plane text-xs"></i>
                 </button>
             </form>
-
-            <!-- Feedback Overlay / Alert Box -->
-            <div id="feedback-box" class="hidden p-4 rounded-2xl text-center font-bold text-sm md:text-base transition shadow-md">
-                <span id="feedback-text"></span>
-            </div>
         </section>
 
         <!-- SCREEN: RESULT -->
@@ -260,6 +282,27 @@
         </section>
 
     </main>
+
+    <!-- MODAL: PAUSE SCREEN -->
+    <div id="modal-pause" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border border-slate-100">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-sm">
+                <i class="fa-solid fa-pause"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-800">一時停止中</h3>
+                <p class="text-xs text-slate-500 mt-1">タイマーのカウントダウンを一時停止しています。</p>
+            </div>
+            <div class="space-y-2 pt-2">
+                <button onclick="togglePause()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl shadow-md transition">
+                    再開する
+                </button>
+                <button onclick="quitQuiz()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-2xl transition text-xs">
+                    中断してステージ一覧へ戻る
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: DATA MANAGEMENT -->
     <div id="modal-data" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -309,7 +352,6 @@
         // 1. LEAP 2300 WORD GENERATOR & BASE DATA
         // ==========================================
 
-        // 代表的な100単語のリアルな基礎データ
         const baseLeapWords = [
             // Stage 1
             { id: 1, word: "increase", meaning: "[自] 増加する" },
@@ -420,7 +462,6 @@
             { id: 100, word: "overcome", meaning: "[他] 克服する" }
         ];
 
-        // 2300語までの完全補完アルゴリズム (プレースホルダー学習対応データ生成)
         const prefixes = ["con", "pre", "sub", "trans", "inter", "over", "under", "re", "dis", "un", "pro", "ex"];
         const roots = ["vide", "spect", "form", "serve", "tract", "port", "struct", "claim", "pend", "scribe"];
         const suffixes = ["tion", "ment", "able", "ive", "ous", "ity", "ly", "ize", "ate", "ful"];
@@ -431,8 +472,6 @@
 
         function generateFull2300Dataset() {
             leap_words = [...baseLeapWords];
-
-            // 101語目から2300語目までを構造的に生成
             for (let i = 101; i <= 2300; i++) {
                 const pref = prefixes[i % prefixes.length];
                 const root = roots[(i * 3) % roots.length];
@@ -440,9 +479,9 @@
                 const pos = posTags[i % posTags.length];
                 const mBase = sampleMeanings[i % sampleMeanings.length];
 
-                // 一意かつ自然な英単語表現を自動構成
                 const generatedWord = (pref + root + suff).toLowerCase();
-                const generatedMeaning = `${pos} ${mBase} (単語#${i})`;
+                // 単語ID表記 (単語#101) を削除し、純粋な意味表現のみに変更
+                const generatedMeaning = `${pos} ${mBase}`;
 
                 leap_words.push({
                     id: i,
@@ -452,18 +491,17 @@
             }
         }
 
-        // 全2300語を初期化生成
         generateFull2300Dataset();
 
         // ==========================================
         // 2. STATE & GLOBAL CONFIGURATION
         // ==========================================
         const WORDS_PER_STAGE = 25;
-        const TOTAL_STAGES = 92; // 2300 / 25
-        const STORAGE_KEY = 'LEAP_2300_CLEARED_STAGES_V2';
+        const TOTAL_STAGES = 92;
+        const STORAGE_KEY = 'LEAP_2300_CLEARED_STAGES_V3';
         const CUSTOM_DATA_KEY = 'LEAP_2300_CUSTOM_WORDS_V2';
 
-        let currentMode = 'choice'; // 'choice' または 'input'
+        let currentMode = 'choice'; 
         let currentStageIndex = 0;
         let currentStageWords = [];
         let currentQuestionIndex = 0;
@@ -472,7 +510,14 @@
         let activeFilter = 'all';
         let audioEnabled = true;
 
-        // Web Audio API による効果音生成システム
+        let speechEnabled = true;
+
+        let timerId = null;
+        let timerRemainingMs = 0;
+        let timerTotalMs = 10000;
+        let timerStartTime = 0;
+        let isPaused = false;
+
         let audioCtx = null;
         function playSound(type) {
             if (!audioEnabled) return;
@@ -480,24 +525,25 @@
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
 
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
                 const now = audioCtx.currentTime;
 
                 if (type === 'correct') {
-                    // 正解音 (ピローン)
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
                     osc.start(now);
                     osc.stop(now + 0.25);
                 } else if (type === 'wrong') {
-                    // 不正解音 (ブブー)
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(160, now);
                     osc.frequency.setValueAtTime(130, now + 0.15);
@@ -505,6 +551,41 @@
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
                     osc.start(now);
                     osc.stop(now + 0.35);
+                } else if (type === 'perfect') {
+                    const notes = [
+                        { f: 523.25, t: 0 },
+                        { f: 659.25, t: 0.08 },
+                        { f: 783.99, t: 0.16 },
+                        { f: 1046.50, t: 0.24 }
+                    ];
+
+                    notes.forEach(note => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(note.f, now + note.t);
+                        const isLast = (note.f === 1046.50);
+                        const duration = isLast ? 0.8 : 0.15;
+                        gain.gain.setValueAtTime(0.2, now + note.t);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + note.t + duration);
+                        osc.start(now + note.t);
+                        osc.stop(now + note.t + duration);
+                    });
+
+                    [523.25, 783.99].forEach(freq => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + 0.24);
+                        gain.gain.setValueAtTime(0.1, now + 0.24);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                        osc.start(now + 0.24);
+                        osc.stop(now + 1.0);
+                    });
                 }
             } catch (e) {
                 console.warn("Audio playback not supported or blocked");
@@ -524,6 +605,28 @@
             }
         }
 
+        function toggleSpeech() {
+            speechEnabled = !speechEnabled;
+            const icon = document.getElementById('icon-speech');
+            const btn = document.getElementById('btn-speech-toggle');
+            if (speechEnabled) {
+                icon.className = "fa-solid fa-bullhorn";
+                btn.className = "p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-sm transition";
+            } else {
+                icon.className = "fa-solid fa-comment-slash";
+                btn.className = "p-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-slate-400 text-sm transition";
+            }
+        }
+
+        function speakWord(text) {
+            if (!speechEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const uttr = new SpeechSynthesisUtterance(text);
+            uttr.lang = 'en-US';
+            uttr.rate = 0.9;
+            window.speechSynthesis.speak(uttr);
+        }
+
         // ==========================================
         // 3. STORAGE & PROGRESS TRACKING
         // ==========================================
@@ -538,11 +641,15 @@
 
         function markStageCleared(stageIdx, accuracy) {
             const cleared = getClearedStages();
-            if (!cleared[stageIdx] || cleared[stageIdx].accuracy < accuracy) {
-                cleared[stageIdx] = {
-                    cleared: true,
+            if (!cleared[stageIdx]) {
+                cleared[stageIdx] = {};
+            }
+            
+            const prevAcc = cleared[stageIdx][currentMode] ? cleared[stageIdx][currentMode].accuracy : 0;
+            if (accuracy > prevAcc || !cleared[stageIdx][currentMode]) {
+                cleared[stageIdx][currentMode] = {
+                    cleared: accuracy >= 70,
                     accuracy: accuracy,
-                    mode: currentMode,
                     date: new Date().toISOString()
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cleared));
@@ -559,14 +666,27 @@
 
         function updateOverallStats() {
             const cleared = getClearedStages();
-            const clearedCount = Object.keys(cleared).length;
-            document.getElementById('cleared-count').textContent = clearedCount;
+            let currentModePerfectCount = 0;
+            let totalClearedStages = 0;
+
+            for (let i = 0; i < TOTAL_STAGES; i++) {
+                if (cleared[i] && cleared[i][currentMode] && cleared[i][currentMode].accuracy === 100) {
+                    currentModePerfectCount++;
+                }
+                if (cleared[i] && (cleared[i].choice?.cleared || cleared[i].jp_choice?.cleared || cleared[i].input?.cleared)) {
+                    totalClearedStages++;
+                }
+            }
+
+            document.getElementById('cleared-count').textContent = totalClearedStages;
             document.getElementById('total-stages-count').textContent = TOTAL_STAGES;
 
-            const totalWordsLearned = clearedCount * WORDS_PER_STAGE;
-            const overallPercent = Math.round((totalWordsLearned / leap_words.length) * 100);
+            const modeLabels = { choice: "英語4択", jp_choice: "日本語4択", input: "スペル入力" };
+            document.getElementById('current-mode-label').textContent = modeLabels[currentMode];
 
-            document.getElementById('overall-progress-percentage').textContent = `${overallPercent}% (${totalWordsLearned} / ${leap_words.length}語)`;
+            const overallPercent = Math.round((currentModePerfectCount / TOTAL_STAGES) * 100);
+
+            document.getElementById('overall-progress-percentage').textContent = `${overallPercent}% (${currentModePerfectCount} / ${TOTAL_STAGES}ステージ)`;
             document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
         }
 
@@ -576,15 +696,23 @@
         function selectMode(mode) {
             currentMode = mode;
             const choiceBtn = document.getElementById('mode-choice-btn');
+            const jpChoiceBtn = document.getElementById('mode-jp-choice-btn');
             const inputBtn = document.getElementById('mode-input-btn');
 
+            choiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            jpChoiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            inputBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+
             if (mode === 'choice') {
-                choiceBtn.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 shadow-sm bg-indigo-600 text-white";
-                inputBtn.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+                choiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white";
+            } else if (mode === 'jp_choice') {
+                jpChoiceBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-indigo-600 text-white";
             } else {
-                inputBtn.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 shadow-sm bg-emerald-600 text-white";
-                choiceBtn.className = "px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+                inputBtn.className = "px-3 py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 shadow-sm bg-emerald-600 text-white";
             }
+
+            renderStageGrid();
+            updateOverallStats();
         }
 
         function filterStages(filter) {
@@ -600,11 +728,20 @@
         }
 
         function showHomeScreen() {
+            stopTimer();
             document.getElementById('screen-home').classList.remove('hidden');
             document.getElementById('screen-quiz').classList.add('hidden');
             document.getElementById('screen-result').classList.add('hidden');
             renderStageGrid();
             updateOverallStats();
+        }
+
+        function quitQuiz() {
+            stopTimer();
+            if (isPaused) {
+                togglePause();
+            }
+            showHomeScreen();
         }
 
         function renderStageGrid() {
@@ -616,33 +753,46 @@
                 const startNum = i * WORDS_PER_STAGE + 1;
                 const endNum = Math.min((i + 1) * WORDS_PER_STAGE, leap_words.length);
 
-                // フィルタリング判定
                 if (activeFilter === 'part1' && (startNum > 500)) continue;
                 if (activeFilter === 'part2' && (startNum < 501 || startNum > 1000)) continue;
                 if (activeFilter === 'part3' && (startNum < 1001 || startNum > 1600)) continue;
                 if (activeFilter === 'part4' && (startNum < 1601)) continue;
 
-                const isCleared = !!cleared[i];
-                const accuracy = isCleared ? cleared[i].accuracy : 0;
+                const stageData = cleared[i] || {};
+                const currentModeData = stageData[currentMode] || { accuracy: 0, cleared: false };
+
+                const isChoice100 = stageData.choice?.accuracy === 100;
+                const isJpChoice100 = stageData.jp_choice?.accuracy === 100;
+                const isInput100 = stageData.input?.accuracy === 100;
+
+                const isCurrentMode100 = currentModeData.accuracy === 100;
 
                 const card = document.createElement('div');
                 card.onclick = () => startStage(i);
-                card.className = `p-3.5 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden ${
-                    isCleared 
-                        ? 'bg-emerald-50/60 border-emerald-400 hover:border-emerald-500' 
-                        : 'bg-white border-slate-200 hover:border-indigo-400'
+                card.className = `p-3 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden ${
+                    isCurrentMode100 
+                        ? 'bg-amber-50/70 border-amber-400 hover:border-amber-500' 
+                        : (currentModeData.cleared ? 'bg-emerald-50/60 border-emerald-400 hover:border-emerald-500' : 'bg-white border-slate-200 hover:border-indigo-400')
                 }`;
 
+                const badgesHtml = `
+                    <div class="flex items-center gap-1 text-[10px] mt-2 pt-1 border-t border-slate-100">
+                        <span class="${isChoice100 ? 'text-emerald-600 font-bold' : 'text-slate-300'}" title="英語4択 100%">英</span>
+                        <span class="${isJpChoice100 ? 'text-indigo-600 font-bold' : 'text-slate-300'}" title="日本語4択 100%">日</span>
+                        <span class="${isInput100 ? 'text-amber-600 font-bold' : 'text-slate-300'}" title="スペル入力 100%">入力</span>
+                    </div>
+                `;
+
                 card.innerHTML = `
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-black tracking-wider ${isCleared ? 'text-emerald-700' : 'text-slate-400'}">STAGE ${i + 1}</span>
-                        ${isCleared 
-                            ? `<span class="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-sm"><i class="fa-solid fa-star text-yellow-300"></i> ${accuracy}%</span>` 
-                            : '<span class="text-xs text-slate-300"><i class="fa-regular fa-circle"></i></span>'}
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] font-black tracking-wider ${isCurrentMode100 ? 'text-amber-700' : (currentModeData.cleared ? 'text-emerald-700' : 'text-slate-400')}">STAGE ${i + 1}</span>
+                        ${isCurrentMode100 
+                            ? `<span class="bg-amber-400 text-amber-950 text-[9px] px-1.5 py-0.5 rounded-md font-extrabold flex items-center gap-0.5 shadow-sm"><i class="fa-solid fa-crown text-yellow-100"></i> 100%</span>` 
+                            : (currentModeData.cleared ? `<span class="bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-md font-bold">${currentModeData.accuracy}%</span>` : '<span class="text-xs text-slate-300"><i class="fa-regular fa-circle"></i></span>')}
                     </div>
                     <div>
                         <div class="text-xs font-black text-slate-800">No. ${startNum}~${endNum}</div>
-                        <div class="text-[10px] text-slate-400 mt-0.5">${WORDS_PER_STAGE} Words</div>
+                        ${badgesHtml}
                     </div>
                 `;
                 grid.appendChild(card);
@@ -665,21 +815,24 @@
             const startIndex = stageIdx * WORDS_PER_STAGE;
             const endIndex = Math.min(startIndex + WORDS_PER_STAGE, leap_words.length);
 
-            // ターゲット25語を取り出してシャッフル
             const sliceWords = leap_words.slice(startIndex, endIndex);
             currentStageWords = shuffleArray([...sliceWords]);
 
             currentQuestionIndex = 0;
             score = 0;
+            isPaused = false;
+            document.getElementById('modal-pause').classList.add('hidden');
 
             document.getElementById('screen-home').classList.add('hidden');
             document.getElementById('screen-result').classList.add('hidden');
             document.getElementById('screen-quiz').classList.remove('hidden');
 
             document.getElementById('quiz-stage-title').textContent = `Stage ${stageIdx + 1}`;
-            document.getElementById('quiz-mode-badge').textContent = currentMode === 'choice' ? '4択モード' : '入力モード';
+            
+            const modeBadges = { choice: "英語4択", jp_choice: "日本語4択", input: "スペル入力" };
+            document.getElementById('quiz-mode-badge').textContent = modeBadges[currentMode];
 
-            if (currentMode === 'choice') {
+            if (currentMode === 'choice' || currentMode === 'jp_choice') {
                 document.getElementById('area-choice-mode').classList.remove('hidden');
                 document.getElementById('area-input-mode').classList.add('hidden');
             } else {
@@ -704,10 +857,11 @@
 
             // 出題情報更新
             document.getElementById('word-id-tag').textContent = `No. ${currentObj.id}`;
-            document.getElementById('question-meaning').textContent = currentObj.meaning;
 
             if (currentMode === 'choice') {
-                // ダミー選択肢生成
+                document.getElementById('question-instruction-tag').textContent = "日本語の意味に合う英単語を選択";
+                document.getElementById('question-meaning').textContent = currentObj.meaning;
+
                 const otherWords = leap_words.filter(w => w.word !== currentObj.word);
                 const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
                 const options = shuffleArray([currentObj, ...shuffledOthers]);
@@ -720,18 +874,135 @@
                     btn.className = "choice-btn group bg-white hover:bg-indigo-50/80 border-2 border-slate-200 hover:border-indigo-400 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
                     btn.disabled = false;
                 }
+            } else if (currentMode === 'jp_choice') {
+                document.getElementById('question-instruction-tag').textContent = "英単語に合う日本語の意味を選択";
+                document.getElementById('question-meaning').textContent = currentObj.word;
+
+                speakWord(currentObj.word);
+
+                const otherWords = leap_words.filter(w => w.word !== currentObj.word);
+                const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
+                const options = shuffleArray([currentObj, ...shuffledOthers]);
+
+		for (let i = 0; i < 4; i++) {
+		    const btn = document.getElementById(`choice-${i}`);
+		    const btnText = document.getElementById(`choice-text-${i}`);
+		    btnText.textContent = currentMode === 'choice' ? options[i].word : options[i].meaning;
+		    btn.dataset.correct = (options[i].word === currentObj.word) ? "true" : "false";
+		    
+		    // 1. クラスの初期化
+		    btn.className = "choice-btn group bg-white hover:bg-indigo-50/80 border-2 border-slate-200 hover:border-indigo-400 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
+		    
+		    // 2. ★ iOS Safari対策：フォーカスを強制解除
+		    btn.blur();
+		    
+		    btn.disabled = false;
+		}
             } else {
+                document.getElementById('question-instruction-tag').textContent = "意味から英単語を正しく入力";
+                document.getElementById('question-meaning').textContent = currentObj.meaning;
+
                 const inputEl = document.getElementById('word-input');
                 inputEl.value = '';
                 inputEl.disabled = false;
                 inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-slate-300 rounded-2xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800";
                 setTimeout(() => inputEl.focus(), 50);
             }
+
+            const durationMs = (currentMode === 'input') ? 30000 : 10000;
+            startTimer(durationMs);
+        }
+
+        // ==========================================
+        // TIMER & PAUSE LOGIC
+        // ==========================================
+        function startTimer(durationMs) {
+            stopTimer();
+            timerTotalMs = durationMs;
+            timerRemainingMs = durationMs;
+            timerStartTime = Date.now();
+            updateTimerBar(100);
+
+            timerId = setInterval(() => {
+                if (isPaused) return;
+
+                const elapsed = Date.now() - timerStartTime;
+                timerRemainingMs = timerTotalMs - elapsed;
+
+                if (timerRemainingMs <= 0) {
+                    timerRemainingMs = 0;
+                    updateTimerBar(0);
+                    handleTimeout();
+                } else {
+                    const pct = (timerRemainingMs / timerTotalMs) * 100;
+                    updateTimerBar(pct);
+                }
+            }, 50);
+        }
+
+        function stopTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+            }
+        }
+
+        function updateTimerBar(percent) {
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = `${percent}%`;
+            if (percent < 30) {
+                bar.className = "bg-rose-500 h-full w-full transition-all linear duration-75";
+            } else {
+                bar.className = "bg-amber-500 h-full w-full transition-all linear duration-75";
+            }
+        }
+
+        function togglePause() {
+            if (!isAnswering) return;
+            isPaused = !isPaused;
+            const modal = document.getElementById('modal-pause');
+
+            if (isPaused) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                timerStartTime = Date.now() - (timerTotalMs - timerRemainingMs);
+                if (currentMode === 'input') {
+                    document.getElementById('word-input').focus();
+                }
+            }
+        }
+
+        function handleTimeout() {
+            if (!isAnswering) return;
+            isAnswering = false;
+            stopTimer();
+
+            playSound('wrong');
+
+            if (currentMode === 'choice' || currentMode === 'jp_choice') {
+                for (let i = 0; i < 4; i++) {
+                    const btn = document.getElementById(`choice-${i}`);
+                    btn.disabled = true;
+                    if (btn.dataset.correct === "true") {
+                        btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
+                    }
+                }
+            } else {
+                const inputEl = document.getElementById('word-input');
+                inputEl.disabled = true;
+                inputEl.className = "w-full text-center text-xl font-bold py-4 px-4 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-2xl focus:outline-none shadow-sm transition shake";
+            }
+
+            const correctInfo = `${currentStageWords[currentQuestionIndex].word} : ${currentStageWords[currentQuestionIndex].meaning}`;
+            showFeedback(false, `時間切れ！ 正解: ${correctInfo}`);
+            setTimeout(nextQuestion, 1600);
         }
 
         function checkChoiceAnswer(selectedIndex) {
-            if (!isAnswering) return;
+            if (!isAnswering || isPaused) return;
             isAnswering = false;
+            stopTimer();
 
             const selectedBtn = document.getElementById(`choice-${selectedIndex}`);
             const isCorrect = selectedBtn.dataset.correct === "true";
@@ -752,15 +1023,17 @@
                 showFeedback(true, "正解！ (Great!)");
             } else {
                 playSound('wrong');
-                showFeedback(false, `不正解... 正解: ${currentStageWords[currentQuestionIndex].word}`);
+                const correctObj = currentStageWords[currentQuestionIndex];
+                const correctStr = currentMode === 'choice' ? correctObj.word : correctObj.meaning;
+                showFeedback(false, `不正解... 正解: ${correctStr}`);
             }
 
-            setTimeout(nextQuestion, 1300);
+            setTimeout(nextQuestion, 1400);
         }
 
         function handleInputSubmit(e) {
             e.preventDefault();
-            if (!isAnswering) return;
+            if (!isAnswering || isPaused) return;
 
             const inputEl = document.getElementById('word-input');
             const userVal = inputEl.value.trim().toLowerCase();
@@ -768,6 +1041,7 @@
 
             if (!userVal) return;
             isAnswering = false;
+            stopTimer();
             inputEl.disabled = true;
 
             if (userVal === correctVal) {
@@ -787,18 +1061,19 @@
         function showFeedback(isCorrect, text) {
             const box = document.getElementById('feedback-box');
             const textEl = document.getElementById('feedback-text');
-            box.classList.remove('hidden');
+            box.classList.remove('invisible');
             textEl.textContent = text;
 
             if (isCorrect) {
-                box.className = "p-3 rounded-2xl text-center font-bold text-sm transition shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
+                box.className = "h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
             } else {
-                box.className = "p-3 rounded-2xl text-center font-bold text-sm transition shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
+                box.className = "h-10 flex items-center justify-center rounded-xl text-center font-bold text-xs md:text-sm transition shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
             }
         }
 
         function hideFeedback() {
-            document.getElementById('feedback-box').classList.add('hidden');
+            const box = document.getElementById('feedback-box');
+            box.classList.add('invisible');
         }
 
         function nextQuestion() {
@@ -814,6 +1089,7 @@
         // 6. RESULT & DATA IMPORT / EXPORT
         // ==========================================
         function showResultScreen() {
+            stopTimer();
             document.getElementById('screen-quiz').classList.add('hidden');
             document.getElementById('screen-result').classList.remove('hidden');
 
@@ -828,10 +1104,28 @@
 
             if (isPassed) {
                 markStageCleared(currentStageIndex, accuracy);
-                document.getElementById('result-title').textContent = `Stage ${currentStageIndex + 1} クリア！`;
-                document.getElementById('result-subtitle').textContent = "素晴らしい成果です！次も挑戦しましょう。";
-                iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-emerald-100 text-emerald-600";
-                iconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+
+                if (accuracy === 100) {
+                    playSound('perfect');
+
+                    document.getElementById('result-title').textContent = `Stage ${currentStageIndex + 1} PERFECT!!`;
+                    document.getElementById('result-subtitle').textContent = "素晴らしい！全問正解パーフェクト達成です！完璧な記憶力です！";
+                    iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-yellow-400 text-indigo-950 animate-bounce";
+                    iconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+
+                    if (typeof confetti === 'function') {
+                        confetti({
+                            particleCount: 120,
+                            spread: 80,
+                            origin: { y: 0.6 }
+                        });
+                    }
+                } else {
+                    document.getElementById('result-title').textContent = `Stage ${currentStageIndex + 1} クリア！`;
+                    document.getElementById('result-subtitle').textContent = "素晴らしい成果です！次も挑戦しましょう。";
+                    iconContainer.className = "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-md bg-emerald-100 text-emerald-600";
+                    iconContainer.innerHTML = '<i class="fa-solid fa-award"></i>';
+                }
             } else {
                 document.getElementById('result-title').textContent = "もう一歩！";
                 document.getElementById('result-subtitle').textContent = "正解率70%以上でクリアとなります。再挑戦しよう！";
@@ -844,7 +1138,6 @@
             startStage(currentStageIndex);
         }
 
-        // Data Management Modal Methods
         function openDataModal() {
             document.getElementById('modal-word-count').textContent = leap_words.length;
             document.getElementById('modal-data').classList.remove('hidden');
@@ -892,12 +1185,11 @@
             reader.readAsText(file);
         }
 
-        // キーボードショートカット操作対応 (1-4キーで4択選択)
         window.addEventListener('keydown', function(e) {
             const quizScreen = document.getElementById('screen-quiz');
-            if (quizScreen.classList.contains('hidden') || !isAnswering) return;
+            if (quizScreen.classList.contains('hidden') || !isAnswering || isPaused) return;
 
-            if (currentMode === 'choice') {
+            if (currentMode === 'choice' || currentMode === 'jp_choice') {
                 if (['1', '2', '3', '4'].includes(e.key)) {
                     const idx = parseInt(e.key) - 1;
                     checkChoiceAnswer(idx);
@@ -905,9 +1197,7 @@
             }
         });
 
-        // アプリ起動時の初期ロード
         window.onload = function() {
-            // カスタムロードデータが存在すれば読み込み
             const savedCustom = localStorage.getItem(CUSTOM_DATA_KEY);
             if (savedCustom) {
                 try {
