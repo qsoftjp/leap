@@ -50,30 +50,27 @@
             background: #94a3b8;
         }
 
-        /* ★ iPhone Safari用 強制フォーカス・ホバー残留対策 */
+        /* ★ iPhone Safari用 強制フォーカス・ホバー残留防止CSS */
         * {
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
         }
         
         .choice-btn {
+            outline: none !important;
+            -webkit-touch-callout: none;
             user-select: none;
             -webkit-user-select: none;
-            outline: none !important;
         }
 
-        /* マウス操作が可能な環境（PCなど）でのみホバーを適用 */
+        /* PCなどのマウス操作時のみホバー効果を適用（Safari残留防止） */
         @media (hover: hover) and (pointer: fine) {
             .choice-btn:hover {
-                background-color: rgba(238, 242, 255, 0.8) !important;
+                background-color: rgba(238, 242, 255, 0.9) !important;
                 border-color: #818cf8 !important;
             }
-        }
-        
-        /* タッチ判定時は hover/active/focus の色変化を完全に抑止 */
-        @media (pointer: coarse) {
-            .choice-btn:hover, .choice-btn:focus, .choice-btn:active {
-                background-color: #ffffff;
+            .choice-btn:hover .choice-num {
+                background-color: #4f46e5 !important;
+                color: #ffffff !important;
             }
         }
     </style>
@@ -226,7 +223,7 @@
                 <div class="text-[11px] text-slate-400 pt-1">ショートカット: [1-4]または[Enter]で即答</div>
             </div>
 
-            <!-- Mode A & B: 4 Choice Buttons Container (JSで毎回動的に再生成) -->
+            <!-- Mode A & B: 4 Choice Buttons Container -->
             <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
 
             <!-- Mode C: Input Word Mode -->
@@ -763,7 +760,6 @@
 
                 const card = document.createElement('div');
                 card.onclick = (e) => {
-                    // タップ直後のフォーカスを解除
                     if (e.currentTarget) e.currentTarget.blur();
                     startStage(i);
                 };
@@ -809,7 +805,6 @@
         }
 
         function startStage(stageIdx) {
-            // アクティブ要素のフォーカスを明示的にクリア
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
@@ -850,7 +845,6 @@
             isAnswering = true;
             hideFeedback();
 
-            // フォーカス解除
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
@@ -879,7 +873,7 @@
                 const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
                 const options = shuffleArray([currentObj, ...shuffledOthers]);
 
-                // ★ Safariで状態が残留するのを防ぐため、ボタンDOMを新しく毎回完全動的生成
+                // ★ ボタンを毎回完全再構築 (pointer-events-none, 内部グループホバー排除)
                 const container = document.getElementById('area-choice-mode');
                 container.innerHTML = '';
 
@@ -888,15 +882,15 @@
                     btn.id = `choice-${i}`;
                     btn.type = "button";
                     btn.dataset.correct = (opt.word === currentObj.word) ? "true" : "false";
-                    btn.className = "choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
+                    btn.className = "choice-btn w-full bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left select-none";
                     
                     const labelText = isChoice ? opt.word : opt.meaning;
                     btn.innerHTML = `
-                        <span class="flex items-center gap-3">
-                            <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">${i + 1}</span>
+                        <span class="flex items-center gap-3 pointer-events-none">
+                            <span class="choice-num w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black transition">${i + 1}</span>
                             <span id="choice-text-${i}" class="text-base font-bold text-slate-800">${labelText}</span>
                         </span>
-                        <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
+                        <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300 pointer-events-none"></i>
                     `;
 
                     btn.onclick = () => checkChoiceAnswer(i);
@@ -1010,7 +1004,6 @@
             isAnswering = false;
             stopTimer();
 
-            // iOS Safariタップ直後のフォーカス解除
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
