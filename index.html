@@ -50,19 +50,31 @@
             background: #94a3b8;
         }
 
-        /* ★ iPhone (Safari) で選択状態・ホバーが残ってしまう問題の防止策 */
+        /* ★ iPhone Safari用 強制フォーカス・ホバー残留対策 */
         * {
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
+        
+        .choice-btn {
+            user-select: none;
+            -webkit-user-select: none;
+            outline: none !important;
+        }
+
+        /* マウス操作が可能な環境（PCなど）でのみホバーを適用 */
         @media (hover: hover) and (pointer: fine) {
             .choice-btn:hover {
                 background-color: rgba(238, 242, 255, 0.8) !important;
                 border-color: #818cf8 !important;
             }
         }
-        /* タッチデバイスでフォーカス・アクティブ時の不要なスタイルを無効化 */
-        .choice-btn:focus, .choice-btn:active {
-            outline: none !important;
+        
+        /* タッチ判定時は hover/active/focus の色変化を完全に抑止 */
+        @media (pointer: coarse) {
+            .choice-btn:hover, .choice-btn:focus, .choice-btn:active {
+                background-color: #ffffff;
+            }
         }
     </style>
 </head>
@@ -214,40 +226,8 @@
                 <div class="text-[11px] text-slate-400 pt-1">ショートカット: [1-4]または[Enter]で即答</div>
             </div>
 
-            <!-- Mode A & B: 4 Choice Buttons -->
-            <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button onclick="checkChoiceAnswer(0)" id="choice-0" class="choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left">
-                    <span class="flex items-center gap-3">
-                        <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">1</span>
-                        <span id="choice-text-0" class="text-base font-bold text-slate-800">--</span>
-                    </span>
-                    <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
-                </button>
-
-                <button onclick="checkChoiceAnswer(1)" id="choice-1" class="choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left">
-                    <span class="flex items-center gap-3">
-                        <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">2</span>
-                        <span id="choice-text-1" class="text-base font-bold text-slate-800">--</span>
-                    </span>
-                    <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
-                </button>
-
-                <button onclick="checkChoiceAnswer(2)" id="choice-2" class="choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left">
-                    <span class="flex items-center gap-3">
-                        <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">3</span>
-                        <span id="choice-text-2" class="text-base font-bold text-slate-800">--</span>
-                    </span>
-                    <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
-                </button>
-
-                <button onclick="checkChoiceAnswer(3)" id="choice-3" class="choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left">
-                    <span class="flex items-center gap-3">
-                        <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">4</span>
-                        <span id="choice-text-3" class="text-base font-bold text-slate-800">--</span>
-                    </span>
-                    <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
-                </button>
-            </div>
+            <!-- Mode A & B: 4 Choice Buttons Container (JSで毎回動的に再生成) -->
+            <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
 
             <!-- Mode C: Input Word Mode -->
             <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-3">
@@ -782,7 +762,11 @@
                 const isCurrentMode100 = currentModeData.accuracy === 100;
 
                 const card = document.createElement('div');
-                card.onclick = () => startStage(i);
+                card.onclick = (e) => {
+                    // タップ直後のフォーカスを解除
+                    if (e.currentTarget) e.currentTarget.blur();
+                    startStage(i);
+                };
                 card.className = `p-3 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden ${
                     isCurrentMode100 
                         ? 'bg-amber-50/70 border-amber-400 hover:border-amber-500' 
@@ -825,7 +809,7 @@
         }
 
         function startStage(stageIdx) {
-            // ★ STAGE選択時のフォーカス・アクティブ状態を即時解除
+            // アクティブ要素のフォーカスを明示的にクリア
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
@@ -859,17 +843,14 @@
                 document.getElementById('area-input-mode').classList.remove('hidden');
             }
 
-            // iOS Safariで直前のタップフォーカスが持ち込まれないよう一瞬送らせて非同期描画
-            setTimeout(() => {
-                renderQuestion();
-            }, 10);
+            renderQuestion();
         }
 
         function renderQuestion() {
             isAnswering = true;
             hideFeedback();
 
-            // ★ 新しい問題に移る際、全選択肢ボタンのフォーカス・タップ状態をリセット
+            // フォーカス解除
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
@@ -885,46 +866,42 @@
             // 出題情報更新
             document.getElementById('word-id-tag').textContent = `No. ${currentObj.id}`;
 
-            if (currentMode === 'choice') {
-                document.getElementById('question-instruction-tag').textContent = "日本語の意味に合う英単語を選択";
-                document.getElementById('question-meaning').textContent = currentObj.meaning;
+            if (currentMode === 'choice' || currentMode === 'jp_choice') {
+                const isChoice = (currentMode === 'choice');
+                document.getElementById('question-instruction-tag').textContent = isChoice ? "日本語の意味に合う英単語を選択" : "英単語に合う日本語の意味を選択";
+                document.getElementById('question-meaning').textContent = isChoice ? currentObj.meaning : currentObj.word;
+
+                if (!isChoice) {
+                    speakWord(currentObj.word);
+                }
 
                 const otherWords = leap_words.filter(w => w.word !== currentObj.word);
                 const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
                 const options = shuffleArray([currentObj, ...shuffledOthers]);
 
-                for (let i = 0; i < 4; i++) {
-                    const btn = document.getElementById(`choice-${i}`);
-                    const btnText = document.getElementById(`choice-text-${i}`);
-                    btnText.textContent = options[i].word;
-                    btn.dataset.correct = (options[i].word === currentObj.word) ? "true" : "false";
-                    
-                    // クラス初期化 (hover: 指定はCSSで管理するため除外)
+                // ★ Safariで状態が残留するのを防ぐため、ボタンDOMを新しく毎回完全動的生成
+                const container = document.getElementById('area-choice-mode');
+                container.innerHTML = '';
+
+                options.forEach((opt, i) => {
+                    const btn = document.createElement('button');
+                    btn.id = `choice-${i}`;
+                    btn.type = "button";
+                    btn.dataset.correct = (opt.word === currentObj.word) ? "true" : "false";
                     btn.className = "choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
-                    btn.blur();
-                    btn.disabled = false;
-                }
-            } else if (currentMode === 'jp_choice') {
-                document.getElementById('question-instruction-tag').textContent = "英単語に合う日本語の意味を選択";
-                document.getElementById('question-meaning').textContent = currentObj.word;
-
-                speakWord(currentObj.word);
-
-                const otherWords = leap_words.filter(w => w.word !== currentObj.word);
-                const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
-                const options = shuffleArray([currentObj, ...shuffledOthers]);
-
-                for (let i = 0; i < 4; i++) {
-                    const btn = document.getElementById(`choice-${i}`);
-                    const btnText = document.getElementById(`choice-text-${i}`);
-                    btnText.textContent = options[i].meaning;
-                    btn.dataset.correct = (options[i].word === currentObj.word) ? "true" : "false";
                     
-                    // クラス初期化 (hover: 指定はCSSで管理するため除外)
-                    btn.className = "choice-btn group bg-white border-2 border-slate-200 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
-                    btn.blur();
-                    btn.disabled = false;
-                }
+                    const labelText = isChoice ? opt.word : opt.meaning;
+                    btn.innerHTML = `
+                        <span class="flex items-center gap-3">
+                            <span class="w-7 h-7 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center text-xs font-black group-hover:bg-indigo-600 group-hover:text-white transition">${i + 1}</span>
+                            <span id="choice-text-${i}" class="text-base font-bold text-slate-800">${labelText}</span>
+                        </span>
+                        <i class="choice-icon fa-solid fa-circle-notch opacity-0 text-slate-300"></i>
+                    `;
+
+                    btn.onclick = () => checkChoiceAnswer(i);
+                    container.appendChild(btn);
+                });
             } else {
                 document.getElementById('question-instruction-tag').textContent = "意味から英単語を正しく入力";
                 document.getElementById('question-meaning').textContent = currentObj.meaning;
@@ -1010,9 +987,11 @@
             if (currentMode === 'choice' || currentMode === 'jp_choice') {
                 for (let i = 0; i < 4; i++) {
                     const btn = document.getElementById(`choice-${i}`);
-                    btn.disabled = true;
-                    if (btn.dataset.correct === "true") {
-                        btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
+                    if (btn) {
+                        btn.disabled = true;
+                        if (btn.dataset.correct === "true") {
+                            btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left";
+                        }
                     }
                 }
             } else {
@@ -1031,22 +1010,24 @@
             isAnswering = false;
             stopTimer();
 
-            // ★ タップ直後にフォーカスを外す（iOS Safariの残留対策）
+            // iOS Safariタップ直後のフォーカス解除
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
 
             const selectedBtn = document.getElementById(`choice-${selectedIndex}`);
-            const isCorrect = selectedBtn.dataset.correct === "true";
+            const isCorrect = selectedBtn ? (selectedBtn.dataset.correct === "true") : false;
 
             for (let i = 0; i < 4; i++) {
                 const btn = document.getElementById(`choice-${i}`);
-                btn.disabled = true;
-                btn.blur(); // ★ 全ボタンのフォーカスを明示的に解除
-                if (btn.dataset.correct === "true") {
-                    btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
-                } else if (i === selectedIndex && !isCorrect) {
-                    btn.className = "choice-btn bg-rose-500 border-2 border-rose-500 text-white p-4 rounded-2xl font-bold shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left shake";
+                if (btn) {
+                    btn.disabled = true;
+                    btn.blur();
+                    if (btn.dataset.correct === "true") {
+                        btn.className = "choice-btn bg-emerald-500 border-2 border-emerald-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left";
+                    } else if (i === selectedIndex && !isCorrect) {
+                        btn.className = "choice-btn bg-rose-500 border-2 border-rose-500 text-white p-4 rounded-2xl font-bold shadow-sm flex items-center justify-between min-h-[3.8rem] text-left shake";
+                    }
                 }
             }
 
