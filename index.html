@@ -77,7 +77,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+    <header id="main-header" class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-2.5 md:py-3.5 flex justify-between items-center">
             <h1 class="text-lg md:text-2xl font-black flex items-center gap-2 cursor-pointer tracking-tight" onclick="showHomeScreen()">
                 <div class="w-8 h-8 md:w-9 md:h-9 bg-yellow-400 text-indigo-900 rounded-lg flex items-center justify-center shadow-md">
@@ -111,7 +111,7 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto w-full px-3 md:px-4 py-2 sm:py-4 flex-1 flex flex-col justify-start">
+    <main class="max-w-5xl mx-auto w-full px-3 md:px-4 py-1 sm:py-4 flex-1 flex flex-col justify-start">
 
         <!-- SCREEN: HOME / STAGE SELECT -->
         <section id="screen-home" class="space-y-4 sm:space-y-6 pt-1">
@@ -177,7 +177,7 @@
         </section>
 
         <!-- SCREEN: QUIZ -->
-        <section id="screen-quiz" class="hidden space-y-2.5 max-w-2xl mx-auto w-full pt-1">
+        <section id="screen-quiz" class="hidden space-y-2 max-w-2xl mx-auto w-full pt-1">
             <!-- Quiz Bar -->
             <div class="flex justify-between items-center bg-white px-3.5 py-2 rounded-xl shadow-sm border border-slate-200">
                 <button onclick="quitQuiz()" class="text-slate-500 hover:text-slate-800 text-xs flex items-center gap-1 font-bold transition">
@@ -225,12 +225,12 @@
             <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
 
             <!-- Mode C: Input Word Mode -->
-            <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-2">
+            <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-1.5">
                 <div class="relative">
                     <input type="text" id="word-input" autocomplete="off" spellcheck="false" placeholder="英単語を入力..."
-                        class="w-full text-center text-lg font-bold py-3 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800">
+                        class="w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-1.5">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-1.5">
                     回答する (Enter) <i class="fa-solid fa-paper-plane text-xs"></i>
                 </button>
             </form>
@@ -718,6 +718,8 @@
 
         function showHomeScreen() {
             stopTimer();
+            // ホーム画面に戻る時は必ずヘッダーを再表示
+            document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('screen-home').classList.remove('hidden');
             document.getElementById('screen-quiz').classList.add('hidden');
             document.getElementById('screen-result').classList.add('hidden');
@@ -828,10 +830,15 @@
             const modeBadges = { choice: "英語4択", jp_choice: "日本語4択", input: "スペル入力" };
             document.getElementById('quiz-mode-badge').textContent = modeBadges[currentMode];
 
+            const headerEl = document.getElementById('main-header');
+
             if (currentMode === 'choice' || currentMode === 'jp_choice') {
+                headerEl.classList.remove('hidden');
                 document.getElementById('area-choice-mode').classList.remove('hidden');
                 document.getElementById('area-input-mode').classList.add('hidden');
             } else {
+                // スペル入力モード時は、iPhoneキーボード表示時に見切れないよう最上部ヘッダーを消す
+                headerEl.classList.add('hidden');
                 document.getElementById('area-choice-mode').classList.add('hidden');
                 document.getElementById('area-input-mode').classList.remove('hidden');
             }
@@ -918,7 +925,7 @@
                 const inputEl = document.getElementById('word-input');
                 inputEl.value = '';
                 inputEl.disabled = false;
-                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800";
+                inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none shadow-sm transition bg-white text-slate-800";
                 setTimeout(() => inputEl.focus(), 50);
             }
 
@@ -1006,7 +1013,7 @@
             } else {
                 const inputEl = document.getElementById('word-input');
                 inputEl.disabled = true;
-                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
+                inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
             }
 
             const correctInfo = `${currentStageWords[currentQuestionIndex].word} : ${currentStageWords[currentQuestionIndex].meaning}`;
@@ -1069,11 +1076,11 @@
             if (userVal === correctVal) {
                 score++;
                 playSound('correct');
-                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-emerald-500 bg-emerald-50 text-emerald-800 rounded-xl focus:outline-none shadow-sm transition";
+                inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-emerald-500 bg-emerald-50 text-emerald-800 rounded-xl focus:outline-none shadow-sm transition";
                 showFeedback(true, "正解！ GREAT!");
             } else {
                 playSound('wrong');
-                inputEl.className = "w-full text-center text-lg font-bold py-3 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
+                inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
                 showFeedback(false, `不正解... 正解: ${currentStageWords[currentQuestionIndex].word}`);
             }
 
@@ -1112,6 +1119,8 @@
         // ==========================================
         function showResultScreen() {
             stopTimer();
+            // リザルト画面ではヘッダーを再表示
+            document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('screen-quiz').classList.add('hidden');
             document.getElementById('screen-result').classList.remove('hidden');
 
