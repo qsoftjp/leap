@@ -866,15 +866,20 @@
                 const shuffledOthers = shuffleArray([...otherWords]).slice(0, 3);
                 const options = shuffleArray([currentObj, ...shuffledOthers]);
 
-                for (let i = 0; i < 4; i++) {
-                    const btn = document.getElementById(`choice-${i}`);
-                    const btnText = document.getElementById(`choice-text-${i}`);
-                    btnText.textContent = options[i].word;
-                    btn.dataset.correct = (options[i].word === currentObj.word) ? "true" : "false";
-                    btn.className = "choice-btn group bg-white hover:bg-indigo-50/80 border-2 border-slate-200 hover:border-indigo-400 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
-                    btn.disabled = false;
-                }
-            } else if (currentMode === 'jp_choice') {
+		for (let i = 0; i < 4; i++) {
+		    const btn = document.getElementById(`choice-${i}`);
+		    const btnText = document.getElementById(`choice-text-${i}`);
+		    btnText.textContent = currentMode === 'choice' ? options[i].word : options[i].meaning;
+		    btn.dataset.correct = (options[i].word === currentObj.word) ? "true" : "false";
+		    
+		    // 1. クラスの初期化
+		    btn.className = "choice-btn group bg-white hover:bg-indigo-50/80 border-2 border-slate-200 hover:border-indigo-400 p-4 rounded-2xl font-bold text-slate-700 shadow-sm transition flex items-center justify-between min-h-[3.8rem] text-left";
+		    
+		    // 2. ★ iOS Safari対策：フォーカスを強制解除
+		    btn.blur();
+		    
+		    btn.disabled = false;
+		}            } else if (currentMode === 'jp_choice') {
                 document.getElementById('question-instruction-tag').textContent = "英単語に合う日本語の意味を選択";
                 document.getElementById('question-meaning').textContent = currentObj.word;
 
